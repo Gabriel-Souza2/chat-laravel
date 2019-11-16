@@ -1,8 +1,8 @@
 <?php
 
 namespace App\Http\Controllers\Api\Auth;
-
 use App\Models\User;
+use App\Events\Registered;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\RegisterRequest;
@@ -15,6 +15,7 @@ class RegisterController extends Controller
         $data = $request->all();
         $user = User::create($data);
         $user->profile()->create($data);
-        return new ProfileResource($user);
+        event(new Registered($user));
+        return ['token' => auth()->login($user)];
     }
 }

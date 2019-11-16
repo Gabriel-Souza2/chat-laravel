@@ -1,4 +1,6 @@
 vendor
+tests
+resources
 
 bootstrap/cache/services.php
 
@@ -16,3 +18,8 @@ phpspec.yml
 
 Dockerfile
 docker-compose.yml
+
+.env.examples
+.gitattributes
+.gitignore
+.editorconfig

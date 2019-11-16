@@ -5,6 +5,10 @@ namespace Tests\Feature\Api\Auth;
 use Tests\TestCase;
 use App\Models\User;
 use App\Models\Profile;
+use App\Events\Registered;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
@@ -12,27 +16,57 @@ class RegisterController extends TestCase
 {
     use RefreshDatabase;
 
-    public function testRegisterNewUser()
+    private function getData()
     {
         $user = ['email' => 'email@test.com', 'password' => 'password'];
         $profile = \factory(Profile::class)->make()->toArray();
 
-        $response = $this->postJson('/api/auth/register', array_merge($user, $profile));
-        $response->assertStatus(201)->assertJsonFragment(
-            array_merge(['email' => $user['email']], $profile)
-        );
+        return \array_merge($user, $profile);
+    }
+    
+    public function testRegisterNewUser()
+    {
+        $data = $this->getData();
+        $response = $this->postJson('/api/auth/register', $data);
+        $response->assertStatus(200)->assertJsonStructure(['token']);
 
-        $this->assertDatabaseHas('users', ['email' => $user['email']]);
-        $this->assertDatabaseHas('profiles', $profile);
+        $this->assertDatabaseHas('users', [
+            'email' => $data['email']
+        ]);
+        $this->assertDatabaseHas('profiles', [
+            'first_name' => $data['first_name'],
+            'last_name' => $data['last_name'],
+            'birthday' => $data['birthday'],
+            'gender' => $data['gender']
+        ]);
     }
 
     public function testEmailMustByUnique()
     {
-        factory(User::class)->create(['email' => 'admin@user.com']);
-        $user = ['email' => 'admin@user.com', 'password' => 'password'];
-        $profile = $profile = \factory(Profile::class)->make()->toArray();
-
-        $response = $this->postJson('/api/auth/register', array_merge($user, $profile));
+        factory(User::class)->create(['email' => 'email@test.com']);
+        $response = $this->postJson('/api/auth/register', $this->getData());
         $response->assertStatus(422);
     }
+
+    public function testRequiredFields()
+    {
+        $response = $this->postJson('/api/auth/register', []);
+        $response->assertStatus(422);
+    }
+
+    public function testDespatchedRegisteredEvent()
+    {
+        Event::fake();
+        $response = $this->postJson('/api/auth/register', $this->getData());
+        Event::assertDispatched(Registered::class);
+    }
+
+    public function testCreateVerificationToken()
+    {
+        $response = $this->postJson('/api/auth/register', $this->getData());
+        $user = User::first();
+        $token = $user->verificationToken()->where('type', 'email')->first();
+        $this->assertNotEmpty($token);
+    }
+
 }
