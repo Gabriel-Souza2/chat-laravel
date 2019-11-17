@@ -27,8 +27,7 @@ class SendEmailVerification
     public function handle(Registered $event)
     {
         $user = $event->getUser();
-        $token = Str::random(60);
-        $user->verificationToken()->create(['token' => $token, 'type' => 'email']);
+        $user->verificationToken()->create(['token' => Str::random(60), 'type' => 'email']);
         $user->notify(new VerifyEmail);
     }
 }

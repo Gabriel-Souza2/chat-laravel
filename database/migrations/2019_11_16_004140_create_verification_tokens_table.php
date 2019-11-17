@@ -17,6 +17,7 @@ class CreateVerificationTokensTable extends Migration
             $table->bigIncrements('id');
             $table->string('token', 60);
             $table->string('type');
+            $table->datetime('exp');
             $table->unsignedBigInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users');
             $table->timestamps();

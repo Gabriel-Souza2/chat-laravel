@@ -14,4 +14,5 @@ use Illuminate\Http\Request;
 */
 Route::namespace('Api\Auth')->prefix('auth')->name('auth.')->group(function () {
     Route::post('register', 'RegisterController@register')->name('register');
+    Route::get('register/verify/{token?}', 'RegisterController@verifyEmail')->middleware('auth:api');
 });

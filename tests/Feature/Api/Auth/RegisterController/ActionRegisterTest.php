@@ -1,18 +1,20 @@
 <?php
 
-namespace Tests\Feature\Api\Auth;
+namespace Tests\Feature\Api\Auth\RegisterController;
 
 use Tests\TestCase;
 use App\Models\User;
 use App\Models\Profile;
 use App\Events\Registered;
 use Illuminate\Support\Arr;
+use App\Notifications\VerifyEmail;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-class RegisterController extends TestCase
+class ActionRegisterTest extends TestCase
 {
     use RefreshDatabase;
 
@@ -67,6 +69,13 @@ class RegisterController extends TestCase
         $user = User::first();
         $token = $user->verificationToken()->where('type', 'email')->first();
         $this->assertNotEmpty($token);
+    }
+
+    public function testDespatchedVerifyEmailNotfication()
+    {
+        Notification::fake();
+        $response = $this->postJson('/api/auth/register', $this->getData());
+        Notification::assertSentTo(User::first(), VerifyEmail::class);
     }
 
 }
