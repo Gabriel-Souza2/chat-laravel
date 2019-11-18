@@ -44,7 +44,7 @@ class ActionRegisterTest extends TestCase
         ]);
     }
 
-    public function testEmailMustByUnique()
+    public function testEmailNotUnique()
     {
         factory(User::class)->create(['email' => 'email@test.com']);
         $response = $this->postJson('/api/auth/register', $this->getData());
