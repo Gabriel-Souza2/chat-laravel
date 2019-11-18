@@ -35,6 +35,7 @@ class ActionRegisterTest extends TestCase
         $this->assertDatabaseHas('users', [
             'email' => $data['email']
         ]);
+
         $this->assertDatabaseHas('profiles', [
             'first_name' => $data['first_name'],
             'last_name' => $data['last_name'],
@@ -61,14 +62,6 @@ class ActionRegisterTest extends TestCase
         Event::fake();
         $response = $this->postJson('/api/auth/register', $this->getData());
         Event::assertDispatched(Registered::class);
-    }
-
-    public function testCreateVerificationToken()
-    {
-        $response = $this->postJson('/api/auth/register', $this->getData());
-        $user = User::first();
-        $token = $user->verificationToken()->where('type', 'email')->first();
-        $this->assertNotEmpty($token);
     }
 
     public function testDespatchedVerifyEmailNotfication()

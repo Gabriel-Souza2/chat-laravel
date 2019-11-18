@@ -4,6 +4,7 @@ namespace App\Listeners;
 
 use App\Events\Registered;
 use Illuminate\Support\Str;
+use App\Models\VerificationToken;
 use App\Notifications\VerifyEmail;
 
 class SendEmailVerification
@@ -27,7 +28,7 @@ class SendEmailVerification
     public function handle(Registered $event)
     {
         $user = $event->getUser();
-        $user->verificationToken()->create(['token' => Str::random(60), 'type' => 'email']);
+        VerificationToken::createToken($user->id, 'email');
         $user->notify(new VerifyEmail);
     }
 }

@@ -24,20 +24,13 @@ class RegisterController extends Controller
 
     public function verifyEmail($token = null)
     {
-        //Se o token existe
-        //Se o token é do tipo email
-        //Seo token não está expirado
-        $user = Auth::user();
-        $valid_token = $user->verificationToken()
-            ->where('token', $token)
-            ->where('type', 'email')
-            ->first();
-        if(isset($valid_token)){
-            $user->email_verified_at = now();
-            $user->save();
-            VerificationToken::find($valid_token['id'])->delete();
+        if (!$token) return response()->json(['message'=>'token not passed'], 422);
+
+        $token = VerificationToken::isValid($token, 'email', Auth::id());
+        if($token){
+            Auth::user()->markEmailAsVerified();
             return response()->json(null, 204);
         }
-        return response()->json(null, 422);
+        return response()->json(['message'=>'Token is not valid or expired'], 422);
     }
 }
