@@ -16,4 +16,6 @@ Route::namespace('Api\Auth')->prefix('auth')->name('auth.')->group(function () {
     Route::post('register', 'RegisterController@register')->name('register');
     Route::get('register/verify/{token?}', 'RegisterController@verifyEmail')->middleware('auth:api');
     Route::post('login', 'AuthController@login');
+    Route::post('logout', 'AuthController@logout');
+    Route::post('refresh', 'AuthController@refresh');
 });

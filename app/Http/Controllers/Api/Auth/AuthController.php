@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Api\Auth;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
@@ -20,9 +19,21 @@ class AuthController extends Controller
             'password' => 'required'
         ]);
 
-        if($token = Auth::attempt($credentials)){
+        if($token = auth()->attempt($credentials)){
             return response()->json(['token' => $token], 200);
         } 
         return response()->json(['error' => 'Unauthorized'], 401);
+    }
+
+    public function logout()
+    {
+        auth()->logout();
+
+        return response()->json(['message' => 'Successfully logged out']);
+    }
+
+    public function refresh()
+    {
+        return ['token' => auth()->refresh()];
     }
 }
