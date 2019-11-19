@@ -31,17 +31,6 @@ class ActionRegisterTest extends TestCase
         $data = $this->getData();
         $response = $this->postJson('/api/auth/register', $data);
         $response->assertStatus(200)->assertJsonStructure(['token']);
-
-        $this->assertDatabaseHas('users', [
-            'email' => $data['email']
-        ]);
-
-        $this->assertDatabaseHas('profiles', [
-            'first_name' => $data['first_name'],
-            'last_name' => $data['last_name'],
-            'birthday' => $data['birthday'],
-            'gender' => $data['gender']
-        ]);
     }
 
     public function testEmailNotUnique()

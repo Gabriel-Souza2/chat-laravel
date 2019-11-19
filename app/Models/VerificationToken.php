@@ -1,37 +1,26 @@
 <?php
 
 namespace App\Models;
-
-use Carbon\Carbon;
-use Illuminate\Support\Str;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
-
 
 class VerificationToken extends Model
 {
     protected $fillable = ['token', 'type', 'user_id', 'exp'];
 
-    public static function createToken($user_id, $type)
+    public function user()
     {
-        $token = Str::random(60);
-        $exp = Carbon::now()->addHours();
-        
-        return self::create([
-            'user_id' => $user_id,
-            'token' => $token,
-            'type' => $type,
-            'exp' => $exp
-        ]);
+        return $this->belongsTo(User::class);
     }
 
-    public static function isValid($token, $type, $user_id)
+    public static function isValid($token, $type, $user_id = null)
     {
         $resp = self::where('token', $token)
-            ->where('user_id', $user_id)
             ->where('type', $type)
-            ->where('exp', '>=', now()->toDateTimeString())
-            ->first();
-
+            ->where('exp', '>=', now()->toDateTimeString());
+        
+        $user_id ? $resp->where('user_id', $user_id) : '';
+        $resp->first();
         return $resp ? $resp->delete() : false;
     }
 }

@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Support\Str;
 use App\Models\VerificationToken;
 use App\Notifications\VerifyEmail;
+use App\Repositories\UserRepository;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
@@ -19,11 +20,11 @@ class VerifyEmailTest extends TestCase
         Notification::fake();
 
         $user = factory(User::class)->create();
-        $token = VerificationToken::createToken($user->id, 'email');
+        $repository = (new UserRepository($user))
+                        ->createToken('email')
+                        ->notify(VerifyEmail::class);
 
-        $url = url("/register/verify_email?token={$token['token']}");
-            
-        Notification::send($user, new VerifyEmail);
+        $url = url("/register/verify_email?token={$repository->getToken('email')}");
 
         Notification::assertSentTo($user, VerifyEmail::class, 
             function($notification, $channels) use ($user, $url){
