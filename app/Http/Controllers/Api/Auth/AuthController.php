@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Api\Auth;
 
-use Illuminate\Http\Request;
+use App\Http\Requests\LoginRequest;
 use App\Http\Controllers\Controller;
 
 class AuthController extends Controller
@@ -12,14 +12,9 @@ class AuthController extends Controller
         $this->middleware('auth:api', ['except' => ['login']]);
     }
 
-    public function login(Request $request)
+    public function login(LoginRequest $request)
     {
-        $credentials = $request->validate([
-            'email' => 'required|email|exists:users',
-            'password' => 'required'
-        ]);
-
-        if($token = auth()->attempt($credentials)){
+        if($token = auth()->attempt($request->all())){
             return response()->json(['token' => $token], 200);
         } 
         return response()->json(['error' => 'Unauthorized'], 401);

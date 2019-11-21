@@ -6,17 +6,23 @@ use App\Events\Registered;
 use App\Notifications\VerifyEmail;
 use App\Repositories\UserRepository;
 use Illuminate\Support\Facades\Auth;
+use App\Contracts\Repositories\UserRepositoryInterface;
+use App\Contracts\Repositories\EmailTokenRepositoryInterface;
 
 class SendEmailVerification
 {
+    public $email;
+    public $user;
     /**
      * Create the event listener.
      *
      * @return void
      */
-    public function __construct()
+    public function __construct(EmailTokenRepositoryInterface $email, 
+                                UserRepositoryInterface $user)
     {
-        //
+        $this->user = $user;
+        $this->email = $email;
     }
 
     /**
@@ -27,8 +33,7 @@ class SendEmailVerification
      */
     public function handle(Registered $event)
     {
-        (new UserRepository($event->getUser()))
-            ->createToken('email')
-            ->notify(VerifyEmail::class);
+        $this->email->createToken(Auth::id());
+        $this->user->notify(Auth::id(), VerifyEmail::class);
     }
 }

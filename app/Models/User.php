@@ -3,11 +3,9 @@
 namespace App\Models;
 
 use App\Models\Profile;
-use App\Models\VerificationToken;
 use Illuminate\Support\Facades\Hash;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class User extends Authenticatable implements JWTSubject
@@ -20,7 +18,7 @@ class User extends Authenticatable implements JWTSubject
      * @var array
      */
     protected $fillable = [
-        'email', 'password',
+        'email', 'password'
     ];
 
     /**
@@ -64,11 +62,6 @@ class User extends Authenticatable implements JWTSubject
     public function profile()
     {
         return $this->hasOne(Profile::class);
-    }
-
-    public function verificationToken()
-    {
-        return $this->hasMany(VerificationToken::class);
     }
 
     public function setPasswordAttribute($password)

@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\Api\Auth\RegisterController;
+namespace Tests\Feature\Api\Auth;
 
 use Tests\TestCase;
 use App\Models\User;
@@ -10,11 +10,12 @@ use Illuminate\Support\Arr;
 use App\Notifications\VerifyEmail;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Event;
+use App\Repositories\EmailTokenRepository;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-class ActionRegisterTest extends TestCase
+class RegisterControllerTest extends TestCase
 {
     use RefreshDatabase;
 
@@ -59,5 +60,23 @@ class ActionRegisterTest extends TestCase
         $response = $this->postJson('/api/auth/register', $this->getData());
         Notification::assertSentTo(User::first(), VerifyEmail::class);
     }
+
+    public function testEmailVerifiedSucess()
+    {
+        $user = factory(User::class)->create();
+        $model = resolve(EmailTokenRepository::class)->createToken($user->id);
+        $response = $this->actingAs($user)
+                    ->get("api/auth/register/verify?token={$model->token}")
+                    ->assertStatus(204);
+    }
+
+    public function testNotPassedToken()
+    {
+        $user = factory(User::class)->create();
+        $response = $this->actingAs($user)
+                    ->get("api/auth/register/verify")
+                    ->assertStatus(422);
+    }
+
 
 }

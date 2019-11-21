@@ -2,9 +2,7 @@
 
 namespace App\Repositories; 
 
-use Carbon\Carbon;
 use App\Models\User;
-use Illuminate\Support\Str;
 use App\Repositories\Repository;
 use Illuminate\Database\Eloquent\Model;
 use App\Contracts\Repositories\UserRepositoryInterface;
@@ -30,34 +28,19 @@ class UserRepository extends Repository implements UserRepositoryInterface
         return $user;
     }
 
-    public function createToken(string $type): UserRepositoryInterface
+    public function notify(Int $id, String $class): UserRepositoryInterface
     {
-        $this->getModel()->verificationToken()->create([
-            'token' => Str::random(60),
-            'exp' => Carbon::now()->addHours(),
-            'type' => $type,
-        ]);
-
+        $this->getModel()->find($id)->notify(new $class($this));
         return $this;
     }
 
-    public function notify(string $class): UserRepositoryInterface
+    public function name(Int $id): String
     {
-        $this->getModel()->notify(new $class($this));
-        return $this;
+        return $this->getModel()->find($id)->profile->name;
     }
 
-    public function getToken(string $type): String
-    {
-        return $this->getModel()
-                ->verificationToken()
-                ->where('type', $type)
-                ->first()
-                ->token;
-    }
-
-    public function name(): String
-    {
-        return $this->getModel()->profile->name;
-    }
+   public function markEmailAsVerified(Int $id): Bool
+   {
+        return $this->getModel()->find($id)->markEmailAsVerified();
+   }
 }

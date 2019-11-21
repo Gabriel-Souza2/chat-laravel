@@ -2,9 +2,11 @@
 
 namespace App\Contracts\Repositories;
 
-interface UserRepositoryInterface {
-    function createToken(string $type): UserRepositoryInterface;
-    function notify(string $class): UserRepositoryInterface;
-    function getToken(string $type): String;
-    function name(): String; 
+use Illuminate\Database\Eloquent\Model;
+
+interface UserRepositoryInterface 
+{
+    function name(Int $id): String;
+    function notify(Int $id, String $class): UserRepositoryInterface;
+    function markEmailAsVerified(Int $id): Bool;
 }

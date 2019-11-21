@@ -15,7 +15,17 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->app->bind(
             'App\Contracts\Repositories\UserRepositoryInterface',
-            'App\Repositories\UserRepositoryInterface'
+            'App\Repositories\UserRepository'
+        );
+
+        $this->app->bind(
+            'App\Contracts\Repositories\EmailTokenRepositoryInterface',
+            'App\Repositories\EmailTokenRepository'
+        );
+
+        $this->app->bind(
+            'App\Contracts\Middleware\CheckTokenInterface',
+            'App\Repositories\EmailTokenRepository'
         );
     }
 

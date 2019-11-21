@@ -1,22 +1,18 @@
 <?php
 
 namespace App\Http\Controllers\Api\Auth;
-use App\Models\User;
 use App\Events\Registered;
 use Illuminate\Http\Request;
-use App\Models\VerificationToken;
 use App\Http\Controllers\Controller;
-use App\Repositories\UserRepository;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\RegisterRequest;
-use App\Http\Resources\ProfileResource;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
+use App\Contracts\Repositories\UserRepositoryInterface;
 
 class RegisterController extends Controller
 {
     public $repository;
 
-    public function __construct(UserRepository $user)
+    public function __construct(UserRepositoryInterface $user)
     {
         $this->repository = $user;
     }
@@ -24,19 +20,14 @@ class RegisterController extends Controller
     public function register(RegisterRequest $request)
     {
         $user = $this->repository->create($request->all());
+        $token = auth()->login($user);
         event(new Registered($user));
-        return ['token' => auth()->login($user)];
+        return ['token' => $token];
     }
 
-    public function verifyEmail($token = null)
+    public function verifyEmail()
     {
-        if (!$token) return response()->json(['message'=>'token not passed'], 422);
-
-        $token = VerificationToken::isValid($token, 'email', Auth::id());
-        if($token){
-            Auth::user()->markEmailAsVerified();
-            return response()->json(null, 204);
-        }
-        return response()->json(['message'=>'Token is not valid or expired'], 422);
+        $this->repository->markEmailAsVerified(Auth::id());
+        return response()->json([], 204);
     }
 }
