@@ -7,7 +7,7 @@ use App\Repositories\Repository;
 use Illuminate\Database\Eloquent\Model;
 use App\Contracts\Repositories\UserRepositoryInterface;
 
-class UserRepository extends Repository implements UserRepositoryInterface 
+class UserRepository extends Repository implements UserRepositoryInterface
 {
     protected $model;
 
@@ -30,11 +30,11 @@ class UserRepository extends Repository implements UserRepositoryInterface
 
     public function notify(Int $id, String $class): UserRepositoryInterface
     {
-        $this->getModel()->find($id)->notify(new $class($this));
+        $this->getModel()->find($id)->notify(resolve($class));
         return $this;
     }
 
-    public function name(Int $id): String
+    public function name(Int $id = null): String
     {
         return $this->getModel()->find($id)->profile->name;
     }

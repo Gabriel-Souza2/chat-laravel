@@ -4,6 +4,8 @@ namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\VerifyEmail as Mailable;
 use Illuminate\Notifications\Notification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -22,10 +24,10 @@ class VerifyEmail extends Notification
      *
      * @return void
      */
-    public function __construct(UserRepositoryInterface $user)
+    public function __construct(UserRepositoryInterface $user, EmailTokenRepositoryInterface $email)
     {
         $this->user = $user;
-        $this->email = resolve(EmailTokenRepositoryInterface::class);
+        $this->email = $email;
     }
 
     /**
@@ -48,12 +50,8 @@ class VerifyEmail extends Notification
 
     public function toMail($notifiable)
     {
-        return (new MailMessage)
-            ->subject('Verifição de Email')
-            ->line("Olá {$this->user->name(Auth::id())}, click no botão abaixo para ativar seu email!")
-            ->action('Verificar Email',
-                url("/register/verify_email?token={$this->email->getToken(Auth::id())}")
-            )
-            ->line("Se não criou uma conta, por favor desconsiderar esse email!");
+        $name = $this->user->name($notifiable->id);
+        $token = $this->email->getToken($notifiable->id);
+        return Mail::to($notifiable->email)->queue(new Mailable($name, $token));
     }
 }
