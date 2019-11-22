@@ -2,32 +2,26 @@
 
 namespace App\Notifications;
 
+use App\Mail\ResetPassword as Mailable;
 use Illuminate\Bus\Queueable;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Mail;
-use App\Mail\VerifyEmail as Mailable;
 use Illuminate\Notifications\Notification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
-use App\Contracts\Repositories\UserRepositoryInterface;
-use App\Contracts\Repositories\EmailTokenRepositoryInterface;
 
-class VerifyEmail extends Notification implements ShouldQueue
+class ResetPassword extends Notification implements ShouldQueue
 {
     use Queueable;
 
-    public $user;
+    public $token;
 
-    public $email;
     /**
      * Create a new notification instance.
      *
      * @return void
      */
-    public function __construct(UserRepositoryInterface $user, EmailTokenRepositoryInterface $email)
+    public function __construct($token)
     {
-        $this->user = $user;
-        $this->email = $email;
+        $this->token = $token;
     }
 
     /**
@@ -47,11 +41,21 @@ class VerifyEmail extends Notification implements ShouldQueue
      * @param  mixed  $notifiable
      * @return \Illuminate\Notifications\Messages\MailMessage
      */
-
     public function toMail($notifiable)
     {
-        $name = $this->user->name($notifiable->id);
-        $token = $this->email->getToken($notifiable->id);
-        return (new Mailable($name, $token))->to($notifiable->email);
+        return (new Mailable($this->token))->to($notifiable->email);
+    }
+
+    /**
+     * Get the array representation of the notification.
+     *
+     * @param  mixed  $notifiable
+     * @return array
+     */
+    public function toArray($notifiable)
+    {
+        return [
+            //
+        ];
     }
 }

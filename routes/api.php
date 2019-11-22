@@ -18,7 +18,11 @@ Route::namespace('Api\Auth')->prefix('auth')->name('auth.')->group(function () {
             ->name('verify')
             ->middleware(['auth:api', 'check.token']);
             
-    Route::post('login', 'AuthController@login');
-    Route::post('logout', 'AuthController@logout');
-    Route::post('refresh', 'AuthController@refresh');
+    Route::post('login', 'AuthController@login')->name('login');
+    Route::post('logout', 'AuthController@logout')->name('logout');
+    Route::post('refresh', 'AuthController@refresh')->name('refresh');
+    Route::post('forgot/password', 'ForgotPasswordController@sendResetLinkEmail')
+            ->name('forgot');
+    Route::post('reset/password', 'ResetPasswordController@callResetPassword');
+
 });

@@ -13,7 +13,7 @@ interface RepositoryInterface {
 
     function all(): Collection;
 
-    function update(int $id, array $data): Model;
+    function update(int $id, array $data): Bool;
 
     function delete(int $id): Bool;
 }

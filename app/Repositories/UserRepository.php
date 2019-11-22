@@ -23,24 +23,24 @@ class UserRepository extends Repository implements UserRepositoryInterface
 
     public function create(array $data): Model
     {
-        $user = $this->getModel()->create($data);
+        $user = parent::create($data);
         $user->profile()->create($data);
         return $user;
     }
 
     public function notify(Int $id, String $class): UserRepositoryInterface
     {
-        $this->getModel()->find($id)->notify(resolve($class));
+        $this->find($id)->notify(resolve($class));
         return $this;
     }
 
     public function name(Int $id = null): String
     {
-        return $this->getModel()->find($id)->profile->name;
+        return $this->find($id)->profile->name;
     }
 
    public function markEmailAsVerified(Int $id): Bool
    {
-        return $this->getModel()->find($id)->markEmailAsVerified();
+        return $this->find($id)->markEmailAsVerified();
    }
 }
