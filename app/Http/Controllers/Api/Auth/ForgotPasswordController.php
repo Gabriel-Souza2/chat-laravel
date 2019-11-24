@@ -21,5 +21,4 @@ class ForgotPasswordController extends Controller
             'message' => 'Email could not be sent to this email address.'
         ]);
     }
-
 }

@@ -20,14 +20,18 @@ class RegisterController extends Controller
     public function register(RegisterRequest $request)
     {
         $user = $this->repository->create($request->all());
+
         $token = auth()->login($user);
+
         event(new Registered($user));
+
         return ['token' => $token];
     }
 
     public function verifyEmail()
     {
         $this->repository->markEmailAsVerified(Auth::id());
+        
         return response()->json([], 204);
     }
 }

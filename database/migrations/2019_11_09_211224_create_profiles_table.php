@@ -17,8 +17,9 @@ class CreateProfilesTable extends Migration
             $table->bigIncrements('id');
             $table->string('first_name');
             $table->string('last_name');
-            $table->date('birthday');
-            $table->enum('gender', ['male', 'female']);
+            $table->date('birthday')->nullable();
+            $table->enum('gender', ['male', 'female'])->nullable();
+            $table->string('avatar')->nullable();
             $table->unsignedBigInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->timestamps();
