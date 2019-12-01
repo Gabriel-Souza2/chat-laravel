@@ -25,13 +25,13 @@ class RegisterController extends Controller
 
         event(new Registered($user));
 
-        return ['token' => $token];
+        return response()->json(['token' => $token]);
     }
 
     public function verifyEmail()
     {
         $this->repository->markEmailAsVerified(Auth::id());
-        
+
         return response()->json([], 204);
     }
 }

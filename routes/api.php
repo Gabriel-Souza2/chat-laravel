@@ -17,7 +17,7 @@ Route::namespace('Api\Auth')->prefix('auth')->name('auth.')->group(function () {
     Route::get('register/verify', 'RegisterController@verifyEmail')
             ->name('verify')
             ->middleware(['auth:api', 'check.token']);
-            
+
     Route::post('login', 'AuthController@login')->name('login');
     Route::post('logout', 'AuthController@logout')->name('logout');
     Route::post('refresh', 'AuthController@refresh')->name('refresh');
@@ -26,6 +26,7 @@ Route::namespace('Api\Auth')->prefix('auth')->name('auth.')->group(function () {
     Route::post('reset/password', 'ResetPasswordController@callResetPassword');
 
     Route::get('social/login/{type}', 'SocialLoginController@redirectToProvider');
-    Route::get('{type}/callback', 'SocialLoginController@handleProviderCallback');
+    Route::get('{type}/callback', 'SocialLoginController@handleProviderCallback')
+            ->middleware('social.token');
 
 });

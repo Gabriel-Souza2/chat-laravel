@@ -27,10 +27,13 @@ class SocialLoginController extends Controller
 
     public function redirectToProvider($type)
     {
-        return Socialite::driver($type)
+        $url = Socialite::driver($type)
                         ->stateless()
                         ->scopes($this->scopes[$type])
-                        ->redirect();
+                        ->redirect()
+                        ->getTargetUrl();
+
+        return response()->json(['url' => $url]);
     }
 
     public function handleProviderCallback($type)
@@ -40,7 +43,7 @@ class SocialLoginController extends Controller
         $user = $this->user->loginSocial($data);
 
         $token = JWTAuth::fromUser($user);
-        
+
         return ['token' => $token];
     }
 }
