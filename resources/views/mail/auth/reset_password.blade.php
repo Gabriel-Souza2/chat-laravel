@@ -1,10 +1,10 @@
 @component('mail::message')
 <h1>Redefinir Senha</h1>
 
-<p>Olá, esse é um email de redefinição de senha! 
+<p>Olá, esse é um email de redefinição de senha!
 Click no botão abaixo para redefinir sua senha</p>
 
-@component('mail::button', ['url' => url("/reset/password?token=$token")])
+@component('mail::button', ['url' => url("/reset/password/$token")])
 Reset Password
 @endcomponent
 

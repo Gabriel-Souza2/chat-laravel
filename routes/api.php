@@ -21,9 +21,9 @@ Route::namespace('Api\Auth')->prefix('auth')->name('auth.')->group(function () {
     Route::post('login', 'AuthController@login')->name('login');
     Route::post('logout', 'AuthController@logout')->name('logout');
     Route::post('refresh', 'AuthController@refresh')->name('refresh');
-    Route::post('forgot/password', 'ForgotPasswordController@sendResetLinkEmail')
+    Route::post('forgot/password', 'ResetPasswordController@forgot')
             ->name('forgot');
-    Route::post('reset/password', 'ResetPasswordController@callResetPassword');
+    Route::post('reset/password', 'ResetPasswordController@reset');
 
     Route::get('social/login/{type}', 'SocialLoginController@redirectToProvider');
     Route::get('{type}/callback', 'SocialLoginController@handleProviderCallback')

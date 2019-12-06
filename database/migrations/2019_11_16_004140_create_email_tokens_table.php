@@ -18,6 +18,7 @@ class CreateEmailTokensTable extends Migration
             $table->string('token');
             $table->unsignedBigInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users');
+            $table->dateTime('exp');
             $table->timestamps();
         });
     }

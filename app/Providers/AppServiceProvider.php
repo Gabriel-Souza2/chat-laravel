@@ -27,6 +27,11 @@ class AppServiceProvider extends ServiceProvider
             'App\Contracts\Middleware\CheckTokenInterface',
             'App\Repositories\EmailTokenRepository'
         );
+
+        $this->app->bind(
+            'App\Contracts\Repositories\ResetPasswordRepositoryInterface',
+            'App\Repositories\ResetPasswordRepository'
+        );
     }
 
     /**

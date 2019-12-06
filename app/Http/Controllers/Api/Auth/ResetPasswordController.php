@@ -3,38 +3,42 @@
 namespace App\Http\Controllers\Api\Auth;
 
 use Illuminate\Http\Request;
+use App\Models\PasswordReset;
+use App\Http\Requests\ResetRequest;
 use App\Http\Controllers\Controller;
-use Illuminate\Foundation\Auth\ResetsPasswords;
+use App\Http\Requests\ForgotRequest;
 use App\Contracts\Repositories\UserRepositoryInterface;
+use App\Contracts\Repositories\ResetPasswordRepositoryInterface;
 
 class ResetPasswordController extends Controller
 {
-    use ResetsPasswords;
-
     public $user;
 
-    public function __construct(UserRepositoryInterface $user)
+    public $password;
+
+    public function __construct(UserRepositoryInterface $user,
+                                ResetPasswordRepositoryInterface $password)
     {
         $this->user = $user;
+        $this->password = $password;
     }
 
-    public function callResetPassword(Request $request)
+    public function forgot(ForgotRequest $request)
     {
-        $this->reset($request);
+        $token = $this->password->createToken($request->email);
+        $this->user->sendResetPassword($request->email, $token);
+        return response()->json(['message' => 'Password reset email sent!' ]);
     }
 
-    protected function resetPassword($user, $password)
+    public function reset(ResetRequest $request)
     {
-        $this->user->update($user->id, ['password'=> $password]);
-    }
+        if(!$this->password->validate($request->email, $request->token)){
+            return response()->json([
+                'errors' => ['token' => 'Invalid Token!']
+            ], 422);
+        }
 
-    protected function sendResetResponse(Request $request, $response)
-    {
-        return response()->json(['message' => 'Password reset successfully.']);
-    }
-
-    protected function sendResetFailedResponse(Request $request, $response)
-    {
-        return response()->json(['message' => 'Failed, Invalid Token.']);
+        $this->user->resetPassword($request->email, $request->password);
+        return response()->json(['message' => 'Password reset successfully']);
     }
 }

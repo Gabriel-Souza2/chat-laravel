@@ -3,7 +3,7 @@
 
 <p>Olá {{ $name }}, click no botão abaixo para ativar seu email! </p>
 
-@component('mail::button', ['url' => url("/register/verify?token=$token")])
+@component('mail::button', ['url' => url("/register/verify/$token")])
 Confimar Email
 @endcomponent
 
